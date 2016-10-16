@@ -14,6 +14,7 @@
 		941176111DB2B005004CC007 /* MoviesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941176101DB2B005004CC007 /* MoviesViewController.swift */; };
 		941176141DB2CAF4004CC007 /* MovieCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941176131DB2CAF4004CC007 /* MovieCell.swift */; };
 		94119AC21DB33DA4008DF614 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 94119AC11DB33DA4008DF614 /* Images.xcassets */; };
+		94119AC61DB349D4008DF614 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94119AC51DB349D4008DF614 /* Reachability.swift */; };
 		947247521DB2F90C00744B0D /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 947247511DB2F90C00744B0D /* DetailViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -29,6 +30,7 @@
 		941176101DB2B005004CC007 /* MoviesViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MoviesViewController.swift; sourceTree = "<group>"; };
 		941176131DB2CAF4004CC007 /* MovieCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MovieCell.swift; sourceTree = "<group>"; };
 		94119AC11DB33DA4008DF614 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		94119AC51DB349D4008DF614 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		947247511DB2F90C00744B0D /* DetailViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -81,6 +83,7 @@
 				941176071DB2AF96004CC007 /* LaunchScreen.storyboard */,
 				9411760A1DB2AF96004CC007 /* Info.plist */,
 				94119AC11DB33DA4008DF614 /* Images.xcassets */,
+				94119AC51DB349D4008DF614 /* Reachability.swift */,
 			);
 			path = MovieViewer;
 			sourceTree = "<group>";
@@ -236,6 +239,7 @@
 				941175FF1DB2AF96004CC007 /* AppDelegate.swift in Sources */,
 				941176111DB2B005004CC007 /* MoviesViewController.swift in Sources */,
 				941176141DB2CAF4004CC007 /* MovieCell.swift in Sources */,
+				94119AC61DB349D4008DF614 /* Reachability.swift in Sources */,
 				947247521DB2F90C00744B0D /* DetailViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

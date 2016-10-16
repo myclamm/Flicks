@@ -10,18 +10,30 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIWebViewDelegate {
 
+    @IBOutlet weak var networkErrorView: UIView!
+    
     @IBOutlet weak var tableView: UITableView!
     var movies : [NSDictionary]?
     var endpoint : String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        networkErrorView.isHidden = true
+        networkErrorView.frame.origin.y - 20
         tableView.dataSource = self
         tableView.delegate = self
         // Do any additional setup after loading the view.
-        
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        if Reachability.isConnectedToNetwork() {
+            // Network connection available
+            
+        } else {
+            // Network connectino unavailable
+            networkErrorView.isHidden = false
+            MBProgressHUD.hide(for: self.view, animated: true)
+        }
         if let endpoint = endpoint {
             let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
             let url = URL(string:"https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
@@ -32,9 +44,17 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                 delegate:nil,
                 delegateQueue:OperationQueue.main
             )
-            MBProgressHUD.showAdded(to: self.view, animated: true)
-            let task : URLSessionDataTask = session.dataTask(with: request,completionHandler: { (dataOrNil, response, error) in
+            
+            
+            
+            let task : URLSessionDataTask? = session.dataTask(with: request,completionHandler: { (dataOrNil, response, error) in
                 MBProgressHUD.hide(for: self.view, animated: true)
+                
+                //Handle error
+                if let error = error {
+                    print("error \(error)")
+                }
+                
                 if let data = dataOrNil {
                     if let responseDictionary = try! JSONSerialization.jsonObject(with: data, options:[]) as? NSDictionary {
                         self.movies = responseDictionary["results"] as? [NSDictionary]
@@ -43,7 +63,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
                     }
                 }
             });
-            task.resume()
+            
+            if let task = task {
+                task.resume()
+            } else {
+                print("errorrrrrrrrr")
+                MBProgressHUD.hide(for: self.view, animated: true)
+            }
+            
         }
         
         
@@ -105,4 +132,5 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
 
 }
+
 
