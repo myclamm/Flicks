@@ -10,7 +10,7 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UIWebViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var networkErrorView: UIView!
     
@@ -18,17 +18,28 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     var movies : [NSDictionary]?
     var endpoint : String?
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        networkErrorView.isHidden = true
-        networkErrorView.frame.origin.y - 20
-        tableView.dataSource = self
-        tableView.delegate = self
-        // Do any additional setup after loading the view.
-        MBProgressHUD.showAdded(to: self.view, animated: true)
+    override func viewWillAppear(_ animated: Bool) {
         if Reachability.isConnectedToNetwork() {
             // Network connection available
-            
+            networkErrorView.isHidden = true
+        } else {
+            // Network connectino unavailable
+            networkErrorView.isHidden = false
+            MBProgressHUD.hide(for: self.view, animated: true)
+        }
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tableView.dataSource = self
+        tableView.delegate = self
+        
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        
+        if Reachability.isConnectedToNetwork() {
+            // Network connection available
+            networkErrorView.isHidden = true
         } else {
             // Network connectino unavailable
             networkErrorView.isHidden = false
