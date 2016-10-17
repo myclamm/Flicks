@@ -10,14 +10,18 @@ import UIKit
 import AFNetworking
 import MBProgressHUD
 
-class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MoviesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate {
 
     @IBOutlet weak var networkErrorView: UIView!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     @IBOutlet weak var tableView: UITableView!
     var movies : [NSDictionary]?
     var endpoint : String?
     let refreshControl = UIRefreshControl()
+    
+    var searchActive : Bool = false
+    var filtered:[NSDictionary] = []
     
     override func viewWillAppear(_ animated: Bool) {
         if Reachability.isConnectedToNetwork() {
@@ -38,11 +42,12 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         tableView.dataSource = self
         tableView.delegate = self
+        searchBar.delegate = self
         
-        refreshData()
+        
         refreshControl.addTarget(self, action: #selector(MoviesViewController.refreshData), for: UIControlEvents.valueChanged)
         tableView.insertSubview(refreshControl, at: 0)
-        
+        refreshData()
         
         
     }
@@ -53,6 +58,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     }
     
     public func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
+        if(searchActive) {
+            return filtered.count
+        }
         if let movies = movies {
             return movies.count
         } else {
@@ -62,7 +71,14 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     
     public func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
-        let movie = self.movies![indexPath.row]
+        let movie : NSDictionary
+        
+        if(searchActive){
+            movie = self.filtered[indexPath.row]
+        } else {
+            movie = self.movies![indexPath.row]
+        }
+        
         let title = movie["title"] as! String
         let overview = movie["overview"] as! String
         
@@ -101,6 +117,47 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         // Pass the selected object to the new view controller.
     }
     
+    // Search Bar Methods
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchActive = true;
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchActive = false;
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        
+        filtered = (self.movies?.filter() { (movie: NSDictionary) -> Bool in
+            let title: NSString = movie["original_title"]! as! NSString
+            let range = title.range(of: searchText, options: NSString.CompareOptions.caseInsensitive)
+            return range.location != NSNotFound
+            })! as [NSDictionary]
+        
+        
+        if(filtered.count == 0){
+            searchActive = false;
+        } else {
+            searchActive = true;
+        }
+        self.tableView.reloadData()
+    }
+    
+    // Not sure why I need this
+    func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    
+    // Refresh Data function
     func refreshData () {
         //Start loading spinner
         MBProgressHUD.showAdded(to: self.view, animated: true)
