@@ -24,9 +24,6 @@ The following **optional** features are implemented:
 - [ ] Customize the highlight and selection effect of the cell.
 - [ ] Customize the navigation bar.
 
-The following **additional** features are implemented:
-
-- [ ] List anything else that you can get done to improve the app functionality!
 
 ## Video Walkthrough
 
