@@ -17,9 +17,13 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
     @IBOutlet weak var tableView: UITableView!
     var movies : [NSDictionary]?
     var endpoint : String?
+    let refreshControl = UIRefreshControl()
     
     override func viewWillAppear(_ animated: Bool) {
         if Reachability.isConnectedToNetwork() {
+            if networkErrorView.isHidden == false {
+                refreshData()
+            }
             // Network connection available
             networkErrorView.isHidden = true
         } else {
@@ -35,54 +39,10 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         tableView.dataSource = self
         tableView.delegate = self
         
-        MBProgressHUD.showAdded(to: self.view, animated: true)
+        refreshData()
+        refreshControl.addTarget(self, action: #selector(MoviesViewController.refreshData), for: UIControlEvents.valueChanged)
+        tableView.insertSubview(refreshControl, at: 0)
         
-        if Reachability.isConnectedToNetwork() {
-            // Network connection available
-            networkErrorView.isHidden = true
-        } else {
-            // Network connectino unavailable
-            networkErrorView.isHidden = false
-            MBProgressHUD.hide(for: self.view, animated: true)
-        }
-        if let endpoint = endpoint {
-            let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
-            let url = URL(string:"https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
-            
-            let request = URLRequest(url: url!)
-            let session = URLSession(
-                configuration: URLSessionConfiguration.default,
-                delegate:nil,
-                delegateQueue:OperationQueue.main
-            )
-            
-            
-            
-            let task : URLSessionDataTask? = session.dataTask(with: request,completionHandler: { (dataOrNil, response, error) in
-                MBProgressHUD.hide(for: self.view, animated: true)
-                
-                //Handle error
-                if let error = error {
-                    print("error \(error)")
-                }
-                
-                if let data = dataOrNil {
-                    if let responseDictionary = try! JSONSerialization.jsonObject(with: data, options:[]) as? NSDictionary {
-                        self.movies = responseDictionary["results"] as? [NSDictionary]
-                        self.tableView.reloadData()
-                        
-                    }
-                }
-            });
-            
-            if let task = task {
-                task.resume()
-            } else {
-                print("errorrrrrrrrr")
-                MBProgressHUD.hide(for: self.view, animated: true)
-            }
-            
-        }
         
         
     }
@@ -139,6 +99,60 @@ class MoviesViewController: UIViewController, UITableViewDataSource, UITableView
         
         // Get the new view controller using segue.destinationViewController.
         // Pass the selected object to the new view controller.
+    }
+    
+    func refreshData () {
+        //Start loading spinner
+        MBProgressHUD.showAdded(to: self.view, animated: true)
+        
+        // Check for internet connection
+        if Reachability.isConnectedToNetwork() {
+            // Network connection available
+            networkErrorView.isHidden = true
+            
+            if let endpoint = endpoint {
+                let apiKey = "a07e22bc18f5cb106bfe4cc1f83ad8ed"
+                let url = URL(string:"https://api.themoviedb.org/3/movie/\(endpoint)?api_key=\(apiKey)")
+                
+                let request = URLRequest(url: url!)
+                let session = URLSession(
+                    configuration: URLSessionConfiguration.default,
+                    delegate:nil,
+                    delegateQueue:OperationQueue.main
+                )
+                
+                let task : URLSessionDataTask? = session.dataTask(with: request,completionHandler: { (dataOrNil, response, error) in
+                    MBProgressHUD.hide(for: self.view, animated: true)
+                    
+                    //Handle error
+                    if let error = error {
+                        print("error \(error)")
+                    }
+                    
+                    if let data = dataOrNil {
+                        if let responseDictionary = try! JSONSerialization.jsonObject(with: data, options:[]) as? NSDictionary {
+                            self.movies = responseDictionary["results"] as? [NSDictionary]
+                            self.tableView.reloadData()
+                            self.refreshControl.endRefreshing()
+                        }
+                    }
+                });
+                
+                if let task = task {
+                    task.resume()
+                } else {
+                    MBProgressHUD.hide(for: self.view, animated: true)
+                }
+                
+            }
+            
+            
+        } else {
+            // Network connection unavailable
+            networkErrorView.isHidden = false
+            MBProgressHUD.hide(for: self.view, animated: true)
+        }
+        
     }
     
 
